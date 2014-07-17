@@ -64,9 +64,9 @@ HTML;
 
 $module = array(
 	'name'	=> "MWS Adverts Click Counter v1.0",
-	'desc'	=> "Kategoriler için belirleyebileceğiniz ilave alanlar",
-	'id'	=> "category-xfield-inc",
-	'icon'	=> "category-xfield.png",
+	'desc'	=> "",
+	'id'	=> "",
+	'icon'	=> "",
 	'date'	=> "07.06.2014",
 	'ifile'	=> "install_module.php",
 	'link'	=> "http://dle.net.tr",
