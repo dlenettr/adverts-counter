@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+	<id>Adverts Counter</id>
+	<version>1.0</version>
+	<vqmver>2.4.1</vqmver>
+	<author>MaRZoCHi</author>
+	<file name=".htaccess">
+		<operation>
+			<ignoreif><![CDATA[RewriteRule ^link/([0-9A-Za-z]{10})(/?)$ index.php?do=adverts&link=$1 [L]]]></ignoreif>
+			<search position="after"><![CDATA[RewriteEngine On]]></search>
+			<add><![CDATA[
+# Reklam Sayacı
+RewriteRule ^link/([0-9A-Za-z]{10})(/?)$ index.php?do=adverts&link=$1 [L]
+# Reklam Sayacı
+]]></add>
+		</operation>
+	</file>
+	<file name="engine/engine.php">
+		<operation>
+			<ignoreif><![CDATA[include ENGINE_DIR . '/modules/adverts.php';]]></ignoreif>
+			<search position="before"><![CDATA[case "changemail" :]]></search>
+			<add><![CDATA[
+// Reklam Sayacı
+	case "adverts" :
+		include ENGINE_DIR . '/modules/adverts.php';
+		break;
+// Reklam Sayacı
+]]></add>
+		</operation>
+	</file>
+	<file name="engine/inc/banners.php">
+		<operation>
+			<ignoreif><![CDATA[function random_str( $length = "10" ) {]]></ignoreif>
+			<search position="before"><![CDATA[if( $_POST['action'] == "doadd" ) {]]></search>
+			<add><![CDATA[
+// Reklam Sayacı
+function random_str( $length = "10" ) {
+	$set = array( );
+	$set = array_merge( $set, range(48,57), range(65,90), range(97,122) );
+	$str = '';
+	for($i = 1; $i <= $length; ++$i) {
+		$ch = rand(0, count($set)-1);
+		$str .= chr( $set[$ch] );
+	}
+	return $str;
+}
+// Reklam Sayacı
+]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[$category = $_POST['category'];]]></search>
+			<add><![CDATA[
+// Reklam Sayacı
+	$clickcount = intval( $_REQUEST['clickcount'] );
+	if ( $clickcount ) {
+		$db_links = array();
+		$db->query("SELECT click_link FROM " . PREFIX . "_banners");
+		while( $row = $db->get_row() ) { $db_links[] = $row['click_link']; }
+		$clicklink = random_str();
+		while( in_array( $clicklink, $db_links ) ) { $clicklink = random_str(); }
+	} else { $clicklink = ""; }
+// Reklam Sayacı
+]]></add>
+		</operation>
+		<operation>
+			<search position="iafter"><![CDATA[{$lang['vote_endinfo']}: {$end_date}]]></search>
+			<add><![CDATA[<!--Reklam Sayacı--><br />Tıklanma sayısı: {$row['clicks']}<!--Reklam Sayacı-->]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[$db->query( "INSERT INTO " . PREFIX . "_banners (banner_tag, descr, code, approve, short_place, bstick, main, category, grouplevel, start, end, fpage, innews) values ('$banner_tag', '$banner_descr', '$banner_code', '$approve', '$short_place', '$bstick', '$main', '$category', '$grouplevel', '$start_date', '$end_date', '$fpage', '$innews')" );]]></search>
+			<add><![CDATA[
+			// Reklam Sayacı
+			$db->query( "INSERT INTO " . PREFIX . "_banners (banner_tag, descr, code, approve, short_place, bstick, main, category, grouplevel, start, end, fpage, innews, click_count, click_link) values ('$banner_tag', '$banner_descr', '$banner_code', '$approve', '$short_place', '$bstick', '$main', '$category', '$grouplevel', '$start_date', '$end_date', '$fpage', '$innews', '$clickcount', '$clicklink')" );
+			// Reklam Sayacı]]></add>
+		</operation>
+
+		<operation>
+			<search position="replace"><![CDATA[$db->query( "UPDATE " . PREFIX . "_banners SET banner_tag='$banner_tag', descr='$banner_descr', code='$banner_code', approve='$approve', short_place='$short_place', bstick='$bstick', main='$main', category='$category', grouplevel='$grouplevel', start='$start_date', end='$end_date', fpage='$fpage', innews='$innews' WHERE id='$id'" );]]></search>
+			<add><![CDATA[
+	// Reklam Sayacı
+	$db->query( "UPDATE " . PREFIX . "_banners SET banner_tag='$banner_tag', descr='$banner_descr', code='$banner_code', approve='$approve', short_place='$short_place', bstick='$bstick', main='$main', category='$category', grouplevel='$grouplevel', start='$start_date', end='$end_date', fpage='$fpage', innews='$innews', click_count = '$clickcount', click_link = '$clicklink' WHERE id='$id'" );
+	// Reklam Sayacı
+]]></add>
+		</operation>
+		<operation>
+			<ignoreif><![CDATA[$checked7 = ($row['click_count']) ? "checked" : "";]]></ignoreif>
+			<search position="after"><![CDATA[$checked6 = ($row['innews']) ? "checked" : "";]]></search>
+			<add><![CDATA[
+	// Reklam Sayacı
+	$checked7 = ($row['click_count']) ? "checked" : "";
+	//Reklam Sayacı
+]]></add>
+		</operation>
+		<operation>
+			<ignoreif><![CDATA[<!--Reklam Sayacı2-->]]></ignoreif>
+			<search position="after"><![CDATA[<input class="icheck" type="checkbox" value="1" name="innews" {$checked6} id="innews" /><label for="innews">{$lang['banners_innews']}</label>]]></search>
+			<add><![CDATA[
+			<!--Reklam Sayacı2-->
+			<br /><input class="icheck" type="checkbox" value="1" name="clickcount" {$checked7} id="clickcount" /><label for="clickcount">Tıklamaları say</label>
+			<!--Reklam Sayacı2-->]]></add>
+		</operation>
+	</file>
+</modification>
